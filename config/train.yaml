@@ -1,0 +1,63 @@
+#### general settings
+name: Dual-Window-SE
+device: cuda:0
+
+#### dataset settings
+dataset:
+  train:
+    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_trainset_wav
+    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_trainset_wav
+
+  test:
+    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_testset_wav
+    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_testset_wav
+
+  dataloader:
+    shuffle: true
+
+  audio16:
+    window: tukey
+    nfft: 256
+    window_length: 256
+    hop_length: 32
+    center: False
+    is_mag: True  # abs(tf-domain)
+
+  audio4:
+    nfft = 64
+    window_length = 64
+    hop_length = 32
+
+#### network structures 根据Blocks和DNN生成配置
+
+
+
+#### training settings: learning rate scheme, loss
+train:
+  epoch: 100
+  early_stop: 10
+  path: /data/home/wangqingzheng/data/home/wangqingzheng/Dual-Window-SE/checkpoints
+  is_gpu: true
+
+#### Optimizer settings
+optim:
+  name: Adam   ### Adam, RMSprop, SGD
+  lr: 1.0e-5
+  momentum: 0.9
+  weight_decay: 0
+  clip_norm: 200 # 梯度减切Gradient Clip。
+  # 设置一个梯度减切的阈值，如果在更新梯度的时候，
+  # 梯度超过这个阈值，则会将其限制在这个范围之内，防止梯度爆炸。
+
+#### Resume training settings
+resume:
+  state: false
+  path: /data/home/wangqingzheng/data/home/wangqingzheng/Dual-Window-SE/checkpoints
+
+#### logger
+logger:
+  name: DPCL
+  path: /data/home/wangqingzheng/data/home/wangqingzheng/Dual-Window-SE/checkpoints
+  screen: true
+  tofile: false
+  print_freq: 100
