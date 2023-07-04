@@ -32,17 +32,22 @@ class EdinburghTrainDataset(Dataset):
         self.uttrs = os.listdir(self.noisy_speech_dir) # get the utterance list
         self.noisy_speech_list = [os.path.join(self.noisy_speech_dir, uttr) for uttr in self.uttrs]
         self.clean_speech_list = [os.path.join(self.clean_speech_dir, uttr) for uttr in self.uttrs]
-        self.frames = self.get_frames()
+        self.source = self.get_frames("source")
+        self.target = self.get_frames("target")
 
     def __len__(self):
-        return len(self.frames)
+        return len(self.source)
 
     def __getitem__(self, index):
-        return self.frames[index]
+        return self.source[index], self.target[index]
 
-    def get_frames(self):
+    def get_frames(self, s_or_t):
         frames = []
-        for ns in self.noisy_speech_list:
+        if s_or_t == "source":
+            l = self.noisy_speech_list
+        else:
+            l = self.clean_speech_list
+        for ns in l:
             ns, sr = librosa.load(ns, sr=16000)
             ns_stft = librosa.stft(ns, n_fft=256, hop_length=32, win_length=256, window='tukey')
             ns_stft = ns_stft.transpose((1, 0)) # the original is (freq, time), transpose to (time, freq)

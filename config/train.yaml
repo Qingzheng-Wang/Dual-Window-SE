@@ -1,6 +1,6 @@
 #### general settings
 name: Dual-Window-SE
-device: cuda:0
+device: cuda:3
 
 #### dataset settings
 dataset:
@@ -213,12 +213,9 @@ DNN1:
     batch_first: true
 
 
-
-
-
-
 #### training settings: learning rate scheme, loss
 train:
+  batch_size: 64
   epoch: 100
   early_stop: 10
   path: /data/home/wangqingzheng/data/home/wangqingzheng/Dual-Window-SE/checkpoints

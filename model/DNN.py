@@ -9,12 +9,12 @@
 # ===================================================
 
 import torch
-from Blocks import *
+from model.Blocks import *
 
 class DNN(torch.nn.Module):
     def __init__(self, iFM, oFM, T, F, type, opt, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.iFM = iFM # input Feature Maps
+        self.iFM = iFM # input Feature Maps(channels)
         self.T = T # time steps
         self.F = F # frequency bins
         self.oFM = oFM # output Feature Maps
