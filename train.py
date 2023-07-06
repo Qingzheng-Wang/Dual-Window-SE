@@ -14,33 +14,68 @@ from data.dataset import EdinburghTrainDataset
 from model.DNN import DNN
 from config.option import parse
 from model.loss import l_ri_mag, l_wav_mag
+from torchmetrics.functional import scale_invariant_signal_distortion_ratio as sisdr
 
 opt_train = parse("config/train.yaml")
 DNN1 = DNN(iFM=1, oFM=1, T=1, F=129, type="DNN1", opt=opt_train)
 DNN1 = DNN1.to(opt_train["device"])
-optim = torch.optim.Adam(DNN1.parameters(), lr=opt_train["optim"]["lr"])
+DNN2 = DNN(iFM=1, oFM=1, T=1, F=129, type="DNN2", opt=opt_train)
+DNN2 = DNN2.to(opt_train["device"])
+optim1 = torch.optim.Adam(DNN1.parameters(), lr=opt_train["optim"]["lr"])
+optim2 = torch.optim.Adam(DNN2.parameters(), lr=opt_train["optim"]["lr"])
 
-def trainer(dataloader, model, loss, optimizer, opt):
+def trainer(dataloader, model1, model2, loss1, loss2, optimizer1, optimizer2, opt):
     with torch.autograd.set_detect_anomaly(True):
-        for b, (x, y) in enumerate(dataloader):
+        for b, (x, y1, y2) in enumerate(dataloader):
             x = x.to(opt["device"])
-            y = y.to(opt["device"])
-            y_pred = model(x)
-            optimizer.zero_grad()
-            l = loss(y_pred, y).reshape(-1).norm()
-            l.backward()
-            optimizer.step()
-            print("batch: {}, loss: {}".format(b, l.item()))
+            y1 = y1.to(opt["device"])
+            y2 = y2.to(opt["device"])
+            y_pred1 = model1(x)
+            optimizer1.zero_grad()
+            l1 = loss1(y_pred1, y1).reshape(-1).mean()
+            l1.backward(retain_graph=True)
+            optimizer1.step()
+            print("DNN1 batch: {}, loss: {}".format(b, l1.item()))
+
+            y_pred2 = model2(y_pred1)
+            optimizer2.zero_grad()
+            l2 = loss2(y_pred2, y2).reshape(-1).mean()
+            l2.backward()
+            optimizer2.step()
+            print("DNN2 batch: {}, loss: {}".format(b, l2.item()))
+
+def tester(dataloader, model1, model2, loss1, loss2, opt):
+    l1 = 0.
+    l2 = 0.
+    sisdr_cur = 0.
+    sisdr_fut = 0.
+    with torch.no_grad():
+        for b, (x, y1, y2) in enumerate(dataloader):
+            x = x.to(opt["device"])
+            y1 = y1.to(opt["device"])
+            y2 = y2.to(opt["device"])
+            y_pred1 = model1(x)
+            l1 += loss1(y_pred1, y1).reshape(-1).mean()
+            sisdr_cur += sisdr(y_pred1, y1)
+            print("DNN1 batch: {}, loss: {}".format(b, l1.item()))
+
+
+            y_pred2 = model2(y_pred1)
+            l2 += loss2(y_pred2, y2).reshape(-1).mean()
+            print("DNN2 batch: {}, loss: {}".format(b, l2.item()))
 
 def train():
     print(opt_train["device"])
+    DNN1.load_state_dict(torch.load("model/params/DNN1_11.pth")) # load the pre-trained model
     for t in range(opt_train["train"]["epoch"]):
+        print("epoch: {}".format(t))
         dataset = EdinburghTrainDataset(noisy_speech_dir=opt_train["dataset"]["train"]["source"],
                                         clean_speech_dir=opt_train["dataset"]["train"]["target"])
         dataloader = DataLoader(dataset, batch_size=opt_train["train"]["batch_size"],
                                 shuffle=opt_train["dataset"]["dataloader"]["shuffle"])
-        trainer(dataloader, DNN1, l_ri_mag, optim, opt_train)
-        torch.save(DNN1.state_dict(), "model/DNN1_{}.pth".format(t))
+        trainer(dataloader, DNN1, DNN2, l_ri_mag, l_ri_mag, optim1, optim2, opt_train)
+        torch.save(DNN1.state_dict(), "model/params/DNN1_{}.pth".format(t))
+        torch.save(DNN2.state_dict(), "model/params/DNN2_{}.pth".format(t))
 
 if __name__ == '__main__':
     train()

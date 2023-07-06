@@ -24,7 +24,7 @@ def l_ri_mag(y16_pred, y16_true):
                    -torch.abs(y16_true), p=1, dim=-1)
     return (a + b + c).reshape(a.shape[0])
 
-def l_wav_mag(y4_oa_pred, y4_oa_true, opt):
+def l_wav_mag(y4_oa_pred, y4_oa_true):
     """
     loss function for the current 4ms frame
     overlap-added with the predicted future 4ms frame(s)
@@ -39,5 +39,5 @@ def l_wav_mag(y4_oa_pred, y4_oa_true, opt):
                               return_complex=True).abs()-
                    torch.stft(y4_oa_true, n_fft=64, hop_length=32,
                               win_length=64, window=torch.hann_window(64).cuda(),
-                              return_complex=True).abs(), p=1, dim=0)
-    return (a + b).to(opt["device"])
+                              return_complex=True).abs(), p=1, dim=-1)
+    return a + b

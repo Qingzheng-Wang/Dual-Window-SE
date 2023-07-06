@@ -5,12 +5,12 @@ device: cuda:7
 #### dataset settings
 dataset:
   train:
-    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_trainset_dev
-    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_trainset_dev
+    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_trainset_wav
+    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_trainset_wav
 
   test:
-    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_testset_dev
-    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_testset_dev
+    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_testset_wav
+    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_testset_wav
 
   dataloader:
     shuffle: true
@@ -210,11 +210,192 @@ DNN1:
     num_layers: 3
     batch_first: true
 
+DNN2:
+  conv2d_cauln:
+    oFM: 30
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  resblock:
+    iFM: 30
+    oFM: 30
+
+    depth_conv1:
+      kernel_size: !!python/tuple [ 3, 3 ]
+      stride: !!python/tuple [ 1, 1 ]
+      padding: !!python/tuple [ 1, 1 ]
+      dilation: !!python/tuple [ 1, 1 ]
+    point_conv1:
+      kernel_size: !!python/tuple [ 1, 1 ]
+      out_channels: 64
+
+    depth_conv2:
+      kernel_size: !!python/tuple [ 3, 3 ]
+      stride: !!python/tuple [ 1, 1 ]
+      padding: !!python/tuple [ 2, 1 ]
+      dilation: !!python/tuple [ 2, 1 ]
+    point_conv2:
+      kernel_size: !!python/tuple [ 1, 1 ]
+
+    depth_conv3:
+      kernel_size: !!python/tuple [ 3, 3 ]
+      stride: !!python/tuple [ 1, 1 ]
+      padding: !!python/tuple [ 4, 1 ]
+      dilation: !!python/tuple [ 4, 1 ]
+    point_conv3:
+      kernel_size: !!python/tuple [ 1, 1 ]
+
+    depth_conv4:
+      kernel_size: !!python/tuple [ 3, 3 ]
+      stride: !!python/tuple [ 1, 1 ]
+      padding: !!python/tuple [ 8, 1 ]
+      dilation: !!python/tuple [ 8, 1 ]
+    point_conv4:
+      kernel_size: !!python/tuple [ 1, 1 ]
+
+    depth_conv5:
+      kernel_size: !!python/tuple [ 3, 3 ]
+      stride: !!python/tuple [ 1, 1 ]
+      padding: !!python/tuple [ 16, 1 ]
+      dilation: !!python/tuple [ 16, 1 ]
+    point_conv5:
+      kernel_size: !!python/tuple [ 1, 1 ]
+
+  conv2d_prelu_bn30:
+    iFM: 30
+    oFM: 30
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 2
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  conv2d_prelu_bn64:
+    iFM: 30
+    oFM: 64
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 2
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  conv2d_prelu_bn192:
+    iFM: 64
+    oFM: 192
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  deconv2d_prelu_bn6430:
+    iFM: 64
+    oFM: 30
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 2
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  deconv2d_prelu_bn30:
+    iFM: 30
+    oFM: 30
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 2
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  deconv2d_prelu_bn64:
+    iFM: 192
+    oFM: 64
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  skip_connection30:
+    iFM: 30
+    oFM: 30
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  skip_connection64:
+    iFM: 64
+    oFM: 64
+    kernel_time: 1
+    kernel_freq: 1
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  skip_connection192:
+    iFM: 192
+    oFM: 192
+    kernel_time: 1
+    kernel_freq: 1
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  deconv2d:
+    iFM: 30
+    kernel_time: 1
+    kernel_freq: 3
+    stride_time: 1
+    stride_freq: 1
+    pad_time: 0
+    pad_freq: 0
+    dilation_time: 1
+    dilation_freq: 1
+
+  lstm:
+    hidden_size: 300
+    num_layers: 3
+    batch_first: true
+
 
 #### training settings: learning rate scheme, loss
 train:
   batch_size: 64
-  epoch: 100
+  epoch: 50
   early_stop: 10
   path: /data/home/wangqingzheng/data/home/wangqingzheng/Dual-Window-SE/checkpoints
   is_gpu: true

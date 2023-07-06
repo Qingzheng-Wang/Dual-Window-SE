@@ -39,7 +39,7 @@ class EdinburghTrainDataset(Dataset):
         return len(self.source)
 
     def __getitem__(self, index):
-        return self.source[index], self.target[index]
+        return self.source[index], self.target[index], self.target[index+1]
 
     def get_frames(self, s_or_t):
         frames = []
