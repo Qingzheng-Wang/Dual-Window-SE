@@ -1,16 +1,16 @@
 #### general settings
 name: Dual-Window-SE
-device: cuda:3
+device: cuda:7
 
 #### dataset settings
 dataset:
   train:
-    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_trainset_wav
-    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_trainset_wav
+    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_trainset_dev
+    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_trainset_dev
 
   test:
-    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_testset_wav
-    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_testset_wav
+    source: /data/home/wangqingzheng/Edinburgh-Dataset/noisy_testset_dev
+    target: /data/home/wangqingzheng/Edinburgh-Dataset/clean_testset_dev
 
   dataloader:
     shuffle: true
@@ -113,8 +113,6 @@ DNN1:
   conv2d_prelu_bn192:
     iFM: 64
     oFM: 192
-    T: 100
-    F: 80
     kernel_time: 1
     kernel_freq: 3
     stride_time: 1

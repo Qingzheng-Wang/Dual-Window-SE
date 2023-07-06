@@ -10,7 +10,7 @@
 
 import torch
 
-def l_ri_mag(y16_pred, y16_true, opt):
+def l_ri_mag(y16_pred, y16_true):
     """
     loss function for every 16ms frames
     :param y16_pred: 16ms spectrum, predicted current frame
@@ -18,11 +18,11 @@ def l_ri_mag(y16_pred, y16_true, opt):
     :param opt: train.yaml, configure
     :return: loss
     """
-    a = torch.norm(y16_pred.real-y16_true.real, p=1, dim=0)
-    b = torch.norm(y16_pred.imag-y16_true.imag, p=1, dim=0)
+    a = torch.norm(y16_pred.real-y16_true.real, p=1, dim=-1)
+    b = torch.norm(y16_pred.imag-y16_true.imag, p=1, dim=-1)
     c = torch.norm(torch.sqrt(torch.square(y16_pred.real)+torch.square(y16_pred.imag))
-                   -torch.abs(y16_true), p=1, dim=0)
-    return (a + b + c).to(opt["device"])
+                   -torch.abs(y16_true), p=1, dim=-1)
+    return (a + b + c).reshape(a.shape[0])
 
 def l_wav_mag(y4_oa_pred, y4_oa_true, opt):
     """
@@ -33,7 +33,7 @@ def l_wav_mag(y4_oa_pred, y4_oa_true, opt):
     :param opt: train.yaml, configure
     :return: loss
     """
-    a = torch.norm(y4_oa_pred - y4_oa_true, p=1, dim=0)
+    a = torch.norm(y4_oa_pred - y4_oa_true, p=1, dim=-1)
     b = torch.norm(torch.stft(y4_oa_pred, n_fft=64, hop_length=32,
                               win_length=64, window=torch.hann_window(64).cuda(),
                               return_complex=True).abs()-

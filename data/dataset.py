@@ -51,5 +51,7 @@ class EdinburghTrainDataset(Dataset):
             ns, sr = librosa.load(ns, sr=16000)
             ns_stft = librosa.stft(ns, n_fft=256, hop_length=32, win_length=256, window='tukey')
             ns_stft = ns_stft.transpose((1, 0)) # the original is (freq, time), transpose to (time, freq)
-            frames.append(ns_stft)
+            frames.extend([ns_stft[i, :].reshape(1, ns_stft.shape[1]) for i in range(ns_stft.shape[0])])
+        # reshape to (1, freq, time) below
+        frames = [f.reshape(1, f.shape[0], f.shape[1]) for f in frames]
         return frames

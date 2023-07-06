@@ -11,6 +11,7 @@
 # ===================================================
 
 import torch
+from complexPyTorch.complexLayers import ComplexConv2d, ComplexBatchNorm2d, ComplexConvTranspose2d, ComplexReLU
 
 class ResBlock(torch.nn.Module):
     def __init__(self, iFM, oFM, T, F, opt, *args, **kwargs):
@@ -21,72 +22,82 @@ class ResBlock(torch.nn.Module):
         self.F = F # frequency bins
         self.opt = opt # options, opt[self.type]["resblock"]
 
-        self.depth_conv1 = torch.nn.Conv2d(in_channels=self.iFM, out_channels=self.oFM,
+        self.depth_conv1 = ComplexConv2d(in_channels=self.iFM, out_channels=self.oFM,
                                            kernel_size=opt["depth_conv1"]["kernel_size"],
                                            stride=opt["depth_conv1"]["stride"],
                                            padding=opt["depth_conv1"]["padding"],
                                            dilation=opt["depth_conv1"]["dilation"],
-                                           groups=self.iFM)
-        self.point_conv1 = torch.nn.Conv2d(in_channels=self.iFM, out_channels=self.oFM,
-                                           kernel_size=opt["point_conv1"]["kernel_size"])
-        self.prelu1 = torch.nn.PReLU()
-        self.bn1 = torch.nn.BatchNorm2d(num_features=self.oFM)
+                                           groups=self.iFM,
+                                           bias=False)
+        self.point_conv1 = ComplexConv2d(in_channels=self.iFM, out_channels=self.oFM,
+                                           kernel_size=opt["point_conv1"]["kernel_size"],
+                                           bias=False)
+        self.prelu1 = ComplexReLU()
+        self.bn1 = ComplexBatchNorm2d(num_features=self.oFM)
         self.ds_conv1 = torch.nn.Sequential(self.depth_conv1, self.point_conv1, self.prelu1, self.bn1)  # depthwise separable convolution
 
-        self.depth_conv2 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
+        self.depth_conv2 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
                                            kernel_size=opt["depth_conv2"]["kernel_size"],
                                            stride=opt["depth_conv2"]["stride"],
                                            padding=opt["depth_conv2"]["padding"],
                                            dilation=opt["depth_conv2"]["dilation"],
-                                           groups=self.oFM)
-        self.point_conv2 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
-                                           kernel_size=opt["point_conv2"]["kernel_size"])
-        self.prelu2 = torch.nn.PReLU()
-        self.bn2 = torch.nn.BatchNorm2d(num_features=self.oFM)
+                                           groups=self.oFM,
+                                           bias=False)
+        self.point_conv2 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
+                                           kernel_size=opt["point_conv2"]["kernel_size"],
+                                           bias=False)
+        self.prelu2 = ComplexReLU()
+        self.bn2 = ComplexBatchNorm2d(num_features=self.oFM)
         self.ds_conv2 = torch.nn.Sequential(self.depth_conv2, self.point_conv2, self.prelu2, self.bn2)
 
-        self.depth_conv3 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
+        self.depth_conv3 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
                                            kernel_size=opt["depth_conv3"]["kernel_size"],
                                            stride=opt["depth_conv3"]["stride"],
                                            padding=opt["depth_conv3"]["padding"],
                                            dilation=opt["depth_conv3"]["dilation"],
-                                           groups=self.oFM)
-        self.point_conv3 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
-                                           kernel_size=opt["point_conv3"]["kernel_size"])
-        self.prelu3 = torch.nn.PReLU()
-        self.bn3 = torch.nn.BatchNorm2d(num_features=self.oFM)
+                                           groups=self.oFM,
+                                           bias=False)
+        self.point_conv3 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
+                                           kernel_size=opt["point_conv3"]["kernel_size"],
+                                           bias=False)
+        self.prelu3 = ComplexReLU()
+        self.bn3 = ComplexBatchNorm2d(num_features=self.oFM)
         self.ds_conv3 = torch.nn.Sequential(self.depth_conv3, self.point_conv3, self.prelu3, self.bn3)
 
-        self.depth_conv4 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
+        self.depth_conv4 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
                                            kernel_size=opt["depth_conv4"]["kernel_size"],
                                            stride=opt["depth_conv4"]["stride"],
                                            padding=opt["depth_conv4"]["padding"],
                                            dilation=opt["depth_conv4"]["dilation"],
-                                           groups=self.oFM)
-        self.point_conv4 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
-                                           kernel_size=opt["point_conv4"]["kernel_size"])
-        self.prelu4 = torch.nn.PReLU()
-        self.bn4 = torch.nn.BatchNorm2d(num_features=self.oFM)
+                                           groups=self.oFM,
+                                           bias=False)
+        self.point_conv4 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
+                                           kernel_size=opt["point_conv4"]["kernel_size"],
+                                           bias=False)
+        self.prelu4 = ComplexReLU()
+        self.bn4 = ComplexBatchNorm2d(num_features=self.oFM)
         self.ds_conv4 = torch.nn.Sequential(self.depth_conv4, self.point_conv4, self.prelu4, self.bn4)
 
-        self.depth_conv5 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
+        self.depth_conv5 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
                                            kernel_size=opt["depth_conv5"]["kernel_size"],
                                            stride=opt["depth_conv5"]["stride"],
                                            padding=opt["depth_conv5"]["padding"],
                                            dilation=opt["depth_conv5"]["dilation"],
-                                           groups=self.oFM)
-        self.point_conv5 = torch.nn.Conv2d(in_channels=self.oFM, out_channels=self.oFM,
-                                           kernel_size=opt["point_conv5"]["kernel_size"])
-        self.prelu5 = torch.nn.PReLU()
-        self.bn5 = torch.nn.BatchNorm2d(num_features=self.oFM)
+                                           groups=self.oFM,
+                                           bias=False)
+        self.point_conv5 = ComplexConv2d(in_channels=self.oFM, out_channels=self.oFM,
+                                           kernel_size=opt["point_conv5"]["kernel_size"],
+                                           bias=False)
+        self.prelu5 = ComplexReLU()
+        self.bn5 = ComplexBatchNorm2d(num_features=self.oFM)
         self.ds_conv5 = torch.nn.Sequential(self.depth_conv5, self.point_conv5, self.prelu5, self.bn5)
 
     def forward(self, x):
-        x += self.ds_conv1(x)
-        x += self.ds_conv2(x)
-        x += self.ds_conv3(x)
-        x += self.ds_conv4(x)
-        x += self.ds_conv5(x)
+        x = x + self.ds_conv1(x)
+        x = x + self.ds_conv2(x)
+        x = x + self.ds_conv3(x)
+        x = x + self.ds_conv4(x)
+        x = x + self.ds_conv5(x)
         return x
 
 class Deconv2DPReLUBN(torch.nn.Module):
@@ -106,13 +117,13 @@ class Deconv2DPReLUBN(torch.nn.Module):
         self.dilation_time = dilation_time
         self.dilation_freq = dilation_freq
 
-        self.deconv = torch.nn.ConvTranspose2d(in_channels=self.iFM, out_channels=self.oFM,
+        self.deconv = ComplexConvTranspose2d(in_channels=self.iFM, out_channels=self.oFM,
                                                kernel_size=(self.kernel_time, self.kernel_freq),
                                                stride=(self.stride_time, self.stride_freq),
                                                padding=(self.pad_time, self.pad_freq),
                                                dilation=(self.dilation_time, self.dilation_freq))
-        self.prelu = torch.nn.PReLU()
-        self.bn = torch.nn.BatchNorm2d(num_features=self.oFM)
+        self.prelu = ComplexReLU()
+        self.bn = ComplexBatchNorm2d(num_features=self.oFM)
 
     def forward(self, x):
         x = self.deconv(x)
@@ -137,13 +148,14 @@ class Conv2DPReLUBN(torch.nn.Module):
         self.dilation_time = dilation_time
         self.dilation_freq = dilation_freq
 
-        self.conv = torch.nn.Conv2d(in_channels=self.iFM, out_channels=self.oFM,
+        self.conv = ComplexConv2d(in_channels=self.iFM, out_channels=self.oFM,
                                     kernel_size=(self.kernel_time, self.kernel_freq),
                                     stride=(self.stride_time, self.stride_freq),
                                     padding=(self.pad_time, self.pad_freq),
-                                    dilation=(self.dilation_time, self.dilation_freq))
-        self.prelu = torch.nn.PReLU()
-        self.bn = torch.nn.BatchNorm2d(num_features=self.oFM)
+                                    dilation=(self.dilation_time, self.dilation_freq),
+                                    bias=False)
+        self.prelu = ComplexReLU()
+        self.bn = ComplexBatchNorm2d(num_features=self.oFM)
 
     def forward(self, x):
         x = self.conv(x)
@@ -168,16 +180,17 @@ class Conv2DCauLN(torch.nn.Module):
         self.dilation_time = dilation_time
         self.dilation_freq = dilation_freq
 
-        self.conv = torch.nn.Conv2d(in_channels=self.iFM, out_channels=self.oFM,
+        self.conv = ComplexConv2d(in_channels=self.iFM, out_channels=self.oFM,
                                     kernel_size=(self.kernel_time, self.kernel_freq),
                                     stride=(self.stride_time, self.stride_freq),
                                     padding=(self.pad_time, self.pad_freq),
-                                    dilation=(self.dilation_time, self.dilation_freq))
-        self.ln = torch.nn.LayerNorm(normalized_shape=[self.oFM, self.T, self.F])
+                                    dilation=(self.dilation_time, self.dilation_freq),
+                                    bias=False)
+        # self.ln = torch.nn.LayerNorm(normalized_shape=[self.oFM, self.T, self.F-2])
 
     def forward(self, x):
         x = self.conv(x)
-        x = self.ln(x)
+        # x = self.ln(x)
         return x
 
 class Deconv2D(torch.nn.Module):
@@ -197,11 +210,12 @@ class Deconv2D(torch.nn.Module):
         self.dilation_time = dilation_time
         self.dilation_freq = dilation_freq
 
-        self.deconv = torch.nn.ConvTranspose2d(in_channels=self.iFM, out_channels=self.oFM,
+        self.deconv = ComplexConvTranspose2d(in_channels=self.iFM, out_channels=self.oFM,
                                                kernel_size=(self.kernel_time, self.kernel_freq),
                                                stride=(self.stride_time, self.stride_freq),
                                                padding=(self.pad_time, self.pad_freq),
-                                               dilation=(self.dilation_time, self.dilation_freq))
+                                               dilation=(self.dilation_time, self.dilation_freq),
+                                               bias=False)
 
     def forward(self, x):
         x = self.deconv(x)

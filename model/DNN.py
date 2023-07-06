@@ -8,8 +8,8 @@
 # Function List:    
 # ===================================================
 
-import torch
 from model.Blocks import *
+from utils.ComplexLSTM import ComplexLSTM
 
 class DNN(torch.nn.Module):
     def __init__(self, iFM, oFM, T, F, type, opt, *args, **kwargs):
@@ -173,11 +173,11 @@ class DNN(torch.nn.Module):
                                  dilation_freq=opt_deconv2d["dilation_freq"])
 
         opt_lstm = opt[self.type]["lstm"]
-        self.lstm = torch.nn.LSTM(input_size=self.T,
-                                  hidden_size=opt_lstm["hidden_size"],
-                                  num_layers=opt_lstm["num_layers"],
-                                  batch_first=opt_lstm["batch_first"],
-                                  proj_size=self.T)
+        self.lstm = ComplexLSTM(in_channels=self.T,
+                                hidden_size=opt_lstm["hidden_size"],
+                                num_layers=opt_lstm["num_layers"])
+                                # batch_first=opt_lstm["batch_first"],
+                                # proj_size=self.T)
 
     def forward(self, x):
         s = []
@@ -193,19 +193,19 @@ class DNN(torch.nn.Module):
         x = self.conv2d_prelu_bn192(x)
         s.append(x)
         x = x.reshape(x.shape[0], x.shape[1], -1) # (batch, channel, time*freq)
-        x, _ = self.lstm(x)
+        x = self.lstm(x)
         x = x.reshape(x.shape[0], x.shape[1], x.shape[2], 1)
-        x += s[-1]
+        x = x + s[-1]
         x = self.deconv2d_prelu_bn64(x)
-        x += s[-2]
+        x = x + s[-2]
         x = self.deconv2d_prelu_bn6430(x)
         t = -2
         for i in range(4):
             t -= 1
-            x += s[t]
+            x = x + s[t]
             x = self.resblock(x)
             x = self.deconv2d_prelu_bn30(x)
-        x += s[0]
+        x = x + s[0]
         x = self.resblock(x)
         x = self.deconv2d(x)
         return x
