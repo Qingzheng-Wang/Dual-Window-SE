@@ -80,7 +80,7 @@ def train():
                                         clean_speech_dir=opt_train["dataset"]["train"]["target"])
         dataloader = DataLoader(dataset, batch_size=opt_train["train"]["batch_size"],
                                 shuffle=opt_train["dataset"]["dataloader"]["shuffle"])
-        trainer(dataloader, DNN1, DNN2, l_ri_mag, l_ri_mag, optim1, optim2, opt_train, t)
+        trainer(dataloader, DNN1, DNN2, l_ri_mag, l_wav_mag, optim1, optim2, opt_train, t)
         torch.save(DNN1.state_dict(), "model/params/DNN1_{}.pth".format(t))
         torch.save(DNN2.state_dict(), "model/params/DNN2_{}.pth".format(t))
 
